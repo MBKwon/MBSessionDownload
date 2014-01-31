@@ -28,7 +28,7 @@
 
 #if DEBUG
 #define CHECK_FOR_EGOCACHE_PLIST() if([key isEqualToString:@"MBResumeDownload.plist"]) { \
-NSLog(@"EGOCache.plist is a reserved key and can not be modified."); \
+NSLog(@"MBResumeDownload.plist is a reserved key and can not be modified."); \
 return; }
 #else
 #define CHECK_FOR_EGOCACHE_PLIST() if([key isEqualToString:@"MBResumeDownload.plist"]) return;
@@ -187,7 +187,7 @@ static inline NSString* cachePathForKey(NSString* directory, NSString* key) {
 		NSMutableDictionary* info = [self.frozenCacheInfo mutableCopy];
 		
 		if(date) {
-			info[key] = date;
+            [info setObject:date forKey:key];
 		} else {
 			[info removeObjectForKey:key];
 		}

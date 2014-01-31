@@ -11,6 +11,8 @@
 
 #define DEFAULT_DESTINATION NSTemporaryDirectory()
 
+#define MAKE_KEY(s) [[[s stringByRemovingPercentEncoding] stringByReplacingOccurrencesOfString:@"/" withString:@""] stringByReplacingOccurrencesOfString:@"." withString:@""]
+
 @interface MBDownloadManager ()
 
 @property (strong, nonatomic) NSURLSession *session;
@@ -33,6 +35,7 @@
         
         instance.sessionTaskList = [NSMutableArray new];
         instance.sessionManager = [MBURLSessionManager new];
+        instance.destinationList = [NSMutableDictionary new];
     });
     
     return instance;
@@ -53,19 +56,20 @@
 }
 
 
--(void)stratDownloadWithURL:(NSString *)downloadURLString
+-(void)startDownloadWithURL:(NSString *)downloadURLString
 {
-    [self stratDownloadWithURL:downloadURLString destination:DEFAULT_DESTINATION];
+    [self startDownloadWithURL:downloadURLString destination:DEFAULT_DESTINATION];
 }
 
--(void)stratDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination
+-(void)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination
 {
-    
-    NSData *resumeData = (NSData *) [[EGOCache globalCache] objectForKey:downloadURLString];
+    NSString *key = MAKE_KEY(downloadURLString);
+    NSData *resumeData = [[EGOCache globalCache] dataForKey:key];
     NSURLSessionDownloadTask *downloadTask;
     
     if (resumeData != nil) {
         
+        [[EGOCache globalCache] removeCacheForKey:key];
         downloadTask = [_session downloadTaskWithResumeData:resumeData];
         
     } else {
@@ -76,7 +80,8 @@
         [_sessionTaskList addObject:downloadTask];
     }
     
-    [downloadTask setDestination:destination];
+    NSString *destinationKey = [NSString stringWithFormat:@"%d", downloadTask.taskIdentifier];
+    [_destinationList setObject:destination forKey:destinationKey];
     [downloadTask resume];
     _sessionManager.firstBlock([downloadTask taskIdentifier]);
 }
@@ -97,20 +102,25 @@
     if (pausedTask != nil) {
         [pausedTask cancelByProducingResumeData:^(NSData *resumeData){
             if (resumeData != nil) {
-                [[EGOCache globalCache] setObject:resumeData forKey:pausedTask.originalRequest.URL.absoluteString withTimeoutInterval:A_WEEK];
+                
+                NSString *key = MAKE_KEY(pausedTask.originalRequest.URL.absoluteString);
+                [[EGOCache globalCache] setData:resumeData forKey:key withTimeoutInterval:A_WEEK];
             }
         }];
+        [_sessionTaskList removeObject:pausedTask];
     }
 }
 
 -(void)pauseAllTasks
 {
-    for (NSURLSessionDownloadTask *task in _sessionTaskList) {
+    for (NSURLSessionDownloadTask *pausedTask in _sessionTaskList) {
         
-        if (task != nil) {
-            [task cancelByProducingResumeData:^(NSData *resumeData){
+        if (pausedTask != nil) {
+            [pausedTask cancelByProducingResumeData:^(NSData *resumeData){
                 if (resumeData != nil) {
-                    [[EGOCache globalCache] setObject:resumeData forKey:task.originalRequest.URL.absoluteString withTimeoutInterval:A_WEEK];
+                    
+                    NSString *key = MAKE_KEY(pausedTask.originalRequest.URL.absoluteString);
+                    [[EGOCache globalCache] setData:resumeData forKey:key withTimeoutInterval:A_WEEK];
                 }
             }];
         }
@@ -123,10 +133,25 @@
 #pragma mark - stop download
 -(void)stopDownloadWithIdentifier:(NSUInteger)taskID
 {
+    for (NSURLSessionDownloadTask *stopTask in _sessionTaskList) {
+        if (stopTask.taskIdentifier == taskID) {
+            [stopTask cancel];
+            [_sessionTaskList removeObject:stopTask];
+            break;
+        }
+    }
 }
 
 -(void)stopAllTasks
 {
+    for (NSURLSessionDownloadTask *stopTask in _sessionTaskList) {
+        
+        if (stopTask != nil) {
+            [stopTask cancel];
+        }
+    }
+    
+    [_sessionTaskList removeAllObjects];
 }
 
 

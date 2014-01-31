@@ -7,6 +7,7 @@
 //
 
 #import "MBURLSessionManager.h"
+#import "MBDownloadManager.h"
 
 @implementation MBURLSessionManager
 
@@ -45,9 +46,10 @@
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSURL *originalURL = [[downloadTask originalRequest] URL];
-    NSURL *destinationURL = [NSURL URLWithString:downloadTask.destination];
     NSError *errorCopy;
     
+    NSString *destinationKey = [NSString stringWithFormat:@"%d", downloadTask.taskIdentifier];
+    NSURL *destinationURL = [NSURL URLWithString:[MBDownloadManager.defaultManager.destinationList objectForKey:destinationKey]];
     
     [fileManager removeItemAtURL:destinationURL error:NULL];
     BOOL success = [fileManager copyItemAtURL:originalURL toURL:destinationURL error:&errorCopy];
@@ -105,21 +107,5 @@
 //
 //    NSLog(@"Alltask are finished");
 //}
-
-@end
-
-
-
-@implementation NSURLSessionDownloadTask (MBDownload)
-
--(void)setDestination:(NSString *)destination
-{
-    self.destination = destination;
-}
-
--(NSString *)destination
-{
-    return self.destination;
-}
 
 @end

@@ -499,6 +499,7 @@
 				F5C3B6DD189B7A6C00FC3022 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F5C3B6DE189B7A6C00FC3022 /* Build configuration list for PBXNativeTarget "MBSessionDownloadTests" */ = {
 			isa = XCConfigurationList;
@@ -507,6 +508,7 @@
 				F5C3B6E0189B7A6C00FC3022 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

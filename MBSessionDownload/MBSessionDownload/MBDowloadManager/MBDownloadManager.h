@@ -11,6 +11,8 @@
 
 @interface MBDownloadManager : NSObject
 
+@property (strong, nonatomic) NSMutableDictionary *destinationList;
+
 
 +(MBDownloadManager *)defaultManager;
 -(void)initWithFirstBlock:(FirstBlock)firstBlock
@@ -19,8 +21,8 @@
              completBolck:(CompleteBlock)completeBlock;
 
 
--(void)stratDownloadWithURL:(NSString *)downloadURLString;
--(void)stratDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination;
+-(void)startDownloadWithURL:(NSString *)downloadURLString;
+-(void)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination;
 
 
 -(void)pauseDownloadWithIdentifier:(NSUInteger)taskID;

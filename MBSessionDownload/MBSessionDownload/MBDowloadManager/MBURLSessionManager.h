@@ -30,11 +30,3 @@ typedef void (^CompleteBlock)(BOOL isFinish, NSString *fielPath);
                                 completBolck:(CompleteBlock)completeBlock;
 
 @end
-
-
-
-@interface NSURLSessionDownloadTask (MBDownload)
-
-@property (strong, nonatomic) NSString *destination;
-
-@end

@@ -34,6 +34,7 @@
     } progressBlock:^(int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite){
         
         NSLog(@"received data lenth : %lld \ntotal received data length : %lld \ntotal data length : %lld", bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
+        [_progress setProgress:((double)totalBytesWritten/(double)totalBytesExpectedToWrite)];
         
     } errorBlock:^(NSError *error){
         
@@ -57,7 +58,7 @@
 
 -(IBAction)startDownload:(id)sender
 {
-    [[MBDownloadManager defaultManager] stratDownloadWithURL:DownloadURLString];
+    [[MBDownloadManager defaultManager] startDownloadWithURL:DownloadURLString];
 }
 
 -(IBAction)pauseDownload:(id)sender
