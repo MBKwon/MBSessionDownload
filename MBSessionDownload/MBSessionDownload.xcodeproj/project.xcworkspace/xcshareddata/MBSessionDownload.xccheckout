@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>C7AF8D0F-17B9-4849-AB0E-1F50A59F0976</string>
+	<key>IDESourceControlProjectName</key>
+	<string>MBSessionDownload</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>A34789AB-81BF-4CE2-B991-A9BBDB028D21</key>
+		<string>https://github.com/MBKwon/MBSessionDownload.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>MBSessionDownload/MBSessionDownload.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>A34789AB-81BF-4CE2-B991-A9BBDB028D21</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/MBKwon/MBSessionDownload.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>A34789AB-81BF-4CE2-B991-A9BBDB028D21</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>A34789AB-81BF-4CE2-B991-A9BBDB028D21</string>
+			<key>IDESourceControlWCCName</key>
+			<string>MBSessionDownload</string>
+		</dict>
+	</array>
+</dict>
+</plist>
