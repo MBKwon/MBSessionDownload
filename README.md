@@ -49,7 +49,7 @@ Requires **iOS 7.0 or later**.
 
 
 ### 1. Blocks
-To immediately start a download in the default MBDownloadManager directory (`tmp/` by default):
+To immediately start a download in the default MBDownloadManager directory (`<Application_Home>/temp` by default):
 
 ```objective-c
 #import "MBDowloadManager/MBDownloadManager.h"
@@ -111,7 +111,7 @@ Stop download:
 ```
 
 
-This will **create** the given path if needed and download the file in the `Path/` directory. **Remember that you should follow the [iOS Data Storage Guidelines](https://developer.apple.com/icloud/documentation/data-storage/)**.
+This will **create** the given path if needed and download the file. Apple recommend putting file to download in `<Application_Home>/Library/Caches` directory. **Remember that you should follow the [iOS Data Storage Guidelines](https://developer.apple.com/icloud/documentation/data-storage/)**.
 
 
 ### 2. Other things you should know
