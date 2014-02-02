@@ -114,13 +114,15 @@ Stop download:
 This will **create** the given path if needed and download the file in the `Path/` directory. **Remember that you should follow the [iOS Data Storage Guidelines](https://developer.apple.com/icloud/documentation/data-storage/)**.
 
 
-### 3. Other things you should know
+### 2. Other things you should know
 **1. This download manager is made using [NSURLSession](https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSession_class/Introduction/Introduction.html) and [NSURLSessionDownloadTask](https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSessionDownloadTask_class/Reference/Reference.html#//apple_ref/occ/cl/NSURLSessionDownloadTask)
 
 **2. Use [EGOCache](https://github.com/enormego/EGOCache) to save resuming data. EGOCache is following a MIT license.
 
 
-### 4. License
+
+License
+=================
 The MIT License (MIT)
 
 Copyright (c) 2014 Moonbeom Kyle KWON
