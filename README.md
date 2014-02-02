@@ -75,15 +75,41 @@ To immediately start a download in the default MBDownloadManager directory (`tmp
         }
         
     }];
+
+
+[[MBDownloadManager defaultManager] startDownloadWithURL:downloadURLString];
+
 ```
+
 
 If you set a customPath:
 
 ```objective-c
 
--(void)startDownloadWithURL:downloadURLString destination:CUSTOM_PATH;
+[[MBDownloadManager defaultManager] startDownloadWithURL:downloadURLString destination:CUSTOM_PATH];
 
 ```
+
+
+Pause and resume download:
+
+```objective-c
+
+[[MBDownloadManager defaultManager] pauseDownloadWithIdentifier:taskID];
+[[MBDownloadManager defaultManager] pauseAllTasks];
+
+```
+
+
+Stop download:
+
+```objective-c
+
+[[MBDownloadManager defaultManager] stopDownloadWithIdentifier:taskID];
+[[MBDownloadManager defaultManager] stopAllTasks];
+
+```
+
 
 This will **create** the given path if needed and download the file in the `Path/` directory. **Remember that you should follow the [iOS Data Storage Guidelines](https://developer.apple.com/icloud/documentation/data-storage/)**.
 
