@@ -4,12 +4,7 @@ MBSessionDownload
 MBSessionDownload
 
 Requires **iOS 7.0 or later**.
-  
-- **[Features](#features)**
-- **[Methods](#methods)**
-- **[Usage](#usage)**
-- **[Change Log](#change-log)**
-- **[Licence](#licence)**
+
 
 ======
 
