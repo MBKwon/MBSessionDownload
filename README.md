@@ -115,9 +115,9 @@ This will **create** the given path if needed and download the file in the `Path
 
 
 ### 2. Other things you should know
-**1. This download manager is made using [NSURLSession](https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSession_class/Introduction/Introduction.html) and [NSURLSessionDownloadTask](https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSessionDownloadTask_class/Reference/Reference.html#//apple_ref/occ/cl/NSURLSessionDownloadTask)
+**1** This download manager is made using [NSURLSession](https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSession_class/Introduction/Introduction.html) and [NSURLSessionDownloadTask](https://developer.apple.com/library/ios/documentation/Foundation/Reference/NSURLSessionDownloadTask_class/Reference/Reference.html#//apple_ref/occ/cl/NSURLSessionDownloadTask)
 
-**2. Use [EGOCache](https://github.com/enormego/EGOCache) to save resuming data. EGOCache is following a MIT license.
+**2** Use [EGOCache](https://github.com/enormego/EGOCache) to save resuming data. EGOCache is following a MIT license.
 
 
 
