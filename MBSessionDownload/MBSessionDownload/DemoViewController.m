@@ -40,7 +40,7 @@
         
         NSLog(@"download error : %@", [error localizedDescription]);
         
-    } completBolck:^(BOOL isFinish, NSString *filePath){
+    } completeBolck:^(BOOL isFinish, NSString *filePath){
         
         if (isFinish) {
             NSLog(@"file path is %@", filePath);

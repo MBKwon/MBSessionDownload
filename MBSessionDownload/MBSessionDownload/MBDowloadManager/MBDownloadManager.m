@@ -44,14 +44,14 @@
 -(void)initWithFirstBlock:(FirstBlock)firstBlock
             progressBlock:(ProgressBlock)progressBlock
                errorBlock:(ErrorBlock)errorBlock
-             completBolck:(CompleteBlock)completeBlock
+             completeBolck:(CompleteBlock)completeBlock
 {
     if (_session == nil) {
-        _session = [_sessionManager getSessionwithConfiguration:_configuration
+        _session = [_sessionManager getSessionWithConfiguration:_configuration
                                                      firstBlock:firstBlock
                                                   progressBlock:progressBlock
                                                      errorBlock:errorBlock
-                                                   completBolck:completeBlock];
+                                                   completeBolck:completeBlock];
     }
 }
 

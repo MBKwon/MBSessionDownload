@@ -23,10 +23,10 @@ typedef void (^CompleteBlock)(BOOL isFinish, NSString *fielPath);
 @property (strong, nonatomic) CompleteBlock completeBlock;
 
 
--(NSURLSession *)getSessionwithConfiguration:(NSURLSessionConfiguration *)configuration
+-(NSURLSession *)getSessionWithConfiguration:(NSURLSessionConfiguration *)configuration
                                   firstBlock:(FirstBlock)firstBlock
                                progressBlock:(ProgressBlock)progressBlock
                                   errorBlock:(ErrorBlock)errorBlock
-                                completBolck:(CompleteBlock)completeBlock;
+                                completeBolck:(CompleteBlock)completeBlock;
 
 @end

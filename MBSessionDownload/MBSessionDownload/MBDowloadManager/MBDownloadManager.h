@@ -18,7 +18,7 @@
 -(void)initWithFirstBlock:(FirstBlock)firstBlock
             progressBlock:(ProgressBlock)progressBlock
                errorBlock:(ErrorBlock)errorBlock
-             completBolck:(CompleteBlock)completeBlock;
+             completeBolck:(CompleteBlock)completeBlock;
 
 
 -(void)startDownloadWithURL:(NSString *)downloadURLString;

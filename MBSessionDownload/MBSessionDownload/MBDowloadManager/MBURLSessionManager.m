@@ -11,11 +11,11 @@
 
 @implementation MBURLSessionManager
 
--(NSURLSession *)getSessionwithConfiguration:(NSURLSessionConfiguration *)configuration
+-(NSURLSession *)getSessionWithConfiguration:(NSURLSessionConfiguration *)configuration
                                   firstBlock:(FirstBlock)firstBlock
                                progressBlock:(ProgressBlock)progressBlock
                                   errorBlock:(ErrorBlock)errorBlock
-                                completBolck:(CompleteBlock)completeBlock
+                                completeBolck:(CompleteBlock)completeBlock
 {
     _firstBlock = firstBlock;
     _progressBlock = progressBlock;
