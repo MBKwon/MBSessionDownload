@@ -1,10 +1,9 @@
 MBSessionDownload
 =================
 
-MBSessionDownload
+MBSessionDownload is best way to download files in your apps. Your apps can download files in a foreground or background.
 
 Requires **iOS 7.0 or later**.
-
 
 ======
 
