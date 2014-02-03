@@ -15,14 +15,14 @@
 
 
 +(MBDownloadManager *)defaultManager;
--(void)initWithFirstBlock:(FirstBlock)firstBlock
-            progressBlock:(ProgressBlock)progressBlock
-               errorBlock:(ErrorBlock)errorBlock
-             completeBolck:(CompleteBlock)completeBlock;
+-(NSUInteger)makeSessionWithFirstBlock:(FirstBlock)firstBlock
+                         progressBlock:(ProgressBlock)progressBlock
+                            errorBlock:(ErrorBlock)errorBlock
+                         completeBolck:(CompleteBlock)completeBlock;
 
 
--(void)startDownloadWithURL:(NSString *)downloadURLString;
--(void)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination;
+-(void)startDownloadWithURL:(NSString *)downloadURLString sessionID:(NSUInteger)sessionID;
+-(void)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination sessionID:(NSUInteger)sessionID;
 
 
 -(void)pauseDownloadWithIdentifier:(NSUInteger)taskID;

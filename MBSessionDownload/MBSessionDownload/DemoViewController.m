@@ -14,6 +14,7 @@
 
 @interface DemoViewController ()
 
+@property (assign, nonatomic) NSUInteger currentSessionID;
 @property (assign, nonatomic) NSUInteger currentTaskID;
 
 @end
@@ -26,7 +27,7 @@
 	// Do any additional setup after loading the view, typically from a nib.
     
     
-    [[MBDownloadManager defaultManager]  initWithFirstBlock:^(NSUInteger taskID){
+    _currentSessionID = [[MBDownloadManager defaultManager]  makeSessionWithFirstBlock:^(NSUInteger taskID){
         
         NSLog(@"task identifier : %d", taskID);
         _currentTaskID = taskID;
@@ -58,7 +59,7 @@
 
 -(IBAction)startDownload:(id)sender
 {
-    [[MBDownloadManager defaultManager] startDownloadWithURL:DownloadURLString];
+    [[MBDownloadManager defaultManager] startDownloadWithURL:DownloadURLString sessionID:_currentSessionID];
 }
 
 -(IBAction)pauseDownload:(id)sender
@@ -68,7 +69,7 @@
 
 -(IBAction)stopDownload:(id)sender
 {
-    [[MBDownloadManager defaultManager] stopDownloadWithIdentifier:_currentTaskID];
+    [[MBDownloadManager defaultManager] stopAllTasks];
 }
 
 @end
