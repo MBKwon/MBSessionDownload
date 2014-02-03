@@ -15,9 +15,9 @@
 
 @interface MBDownloadManager ()
 
+@property (strong, nonatomic) MBURLSessionManager *sessionManager;
 @property (strong, nonatomic) NSMutableArray *sessionList;
 @property (strong, nonatomic) NSURLSessionConfiguration *configuration;
-@property (strong, nonatomic) MBURLSessionManager *sessionManager;
 @property (strong, nonatomic) NSMutableArray *sessionTaskList;
 
 @end
@@ -33,22 +33,20 @@
         
         instance.configuration = [NSURLSessionConfiguration backgroundSessionConfiguration:@"com.MBKWON.MBSessionDownload - BackgroundSession"];
         
+        instance.sessionManager = [MBURLSessionManager new];
         instance.sessionList = [NSMutableArray new];
         instance.sessionTaskList = [NSMutableArray new];
-        instance.sessionManager = [MBURLSessionManager new];
         instance.destinationList = [NSMutableDictionary new];
     });
     
     return instance;
 }
 
--(NSUInteger)makeSessionWithFirstBlock:(FirstBlock)firstBlock
-                         progressBlock:(ProgressBlock)progressBlock
-                            errorBlock:(ErrorBlock)errorBlock
-                         completeBolck:(CompleteBlock)completeBlock
-{    
+-(NSUInteger)makeSessionWithProgressBlock:(ProgressBlock)progressBlock
+                               errorBlock:(ErrorBlock)errorBlock
+                            completeBolck:(CompleteBlock)completeBlock
+{
     NSURLSession *session = [_sessionManager getSessionWithConfiguration:_configuration
-                                                              firstBlock:firstBlock
                                                            progressBlock:progressBlock
                                                               errorBlock:errorBlock
                                                            completeBolck:completeBlock];
@@ -57,12 +55,12 @@
 }
 
 
--(void)startDownloadWithURL:(NSString *)downloadURLString sessionID:(NSUInteger)sessionID
+-(NSUInteger)startDownloadWithURL:(NSString *)downloadURLString sessionID:(NSUInteger)sessionID
 {
-    [self startDownloadWithURL:downloadURLString destination:DEFAULT_DESTINATION sessionID:sessionID];
+    return [self startDownloadWithURL:downloadURLString destination:DEFAULT_DESTINATION sessionID:sessionID];
 }
 
--(void)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination sessionID:(NSUInteger)sessionID
+-(NSUInteger)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination sessionID:(NSUInteger)sessionID
 {
     NSString *key = MAKE_KEY(downloadURLString);
     NSData *resumeData = [[EGOCache globalCache] dataForKey:key];
@@ -84,7 +82,8 @@
     [_destinationList setObject:destination forKey:destinationKey];
     [_sessionTaskList addObject:downloadTask];
     [downloadTask resume];
-    _sessionManager.firstBlock([downloadTask taskIdentifier]);
+    
+    return [downloadTask taskIdentifier];
 }
 
 

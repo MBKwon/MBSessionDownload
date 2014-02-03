@@ -12,12 +12,10 @@
 @implementation MBURLSessionManager
 
 -(NSURLSession *)getSessionWithConfiguration:(NSURLSessionConfiguration *)configuration
-                                  firstBlock:(FirstBlock)firstBlock
                                progressBlock:(ProgressBlock)progressBlock
                                   errorBlock:(ErrorBlock)errorBlock
-                                completeBolck:(CompleteBlock)completeBlock
+                               completeBolck:(CompleteBlock)completeBlock
 {
-    _firstBlock = firstBlock;
     _progressBlock = progressBlock;
     _errorBlock = errorBlock;
     _completeBlock = completeBlock;
@@ -36,7 +34,7 @@
     
     if (_progressBlock) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            _progressBlock(bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
+            _progressBlock([downloadTask taskIdentifier], bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
         });
     }
 }
@@ -58,7 +56,7 @@
         
         if (_completeBlock) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                _completeBlock(YES, [destinationURL absoluteString]);
+                _completeBlock([downloadTask taskIdentifier], success, [destinationURL absoluteString]);
             });
         }
         
@@ -66,7 +64,7 @@
         
         NSLog(@"Error during the copy : %@", [errorCopy localizedDescription]);
         if (_errorBlock) {
-            _errorBlock(errorCopy);
+            _errorBlock([downloadTask taskIdentifier], errorCopy);
         }
     }
 }

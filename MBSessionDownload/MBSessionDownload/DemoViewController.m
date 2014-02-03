@@ -27,21 +27,18 @@
 	// Do any additional setup after loading the view, typically from a nib.
     
     
-    _currentSessionID = [[MBDownloadManager defaultManager]  makeSessionWithFirstBlock:^(NSUInteger taskID){
-        
-        NSLog(@"task identifier : %d", taskID);
-        _currentTaskID = taskID;
-        
-    } progressBlock:^(int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite){
+    _currentSessionID = [[MBDownloadManager defaultManager]
+                         makeSessionWithProgressBlock:^(NSUInteger taskID, int64_t bytesWritten,
+                                                        int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite){
         
         NSLog(@"received data lenth : %lld \ntotal received data length : %lld \ntotal data length : %lld", bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
         [_progress setProgress:((double)totalBytesWritten/(double)totalBytesExpectedToWrite)];
         
-    } errorBlock:^(NSError *error){
+    } errorBlock:^(NSUInteger taskID, NSError *error){
         
         NSLog(@"download error : %@", [error localizedDescription]);
         
-    } completeBolck:^(BOOL isFinish, NSString *filePath){
+    } completeBolck:^(NSUInteger taskID, BOOL isFinish, NSString *filePath){
         
         if (isFinish) {
             NSLog(@"file path is %@", filePath);
@@ -59,7 +56,7 @@
 
 -(IBAction)startDownload:(id)sender
 {
-    [[MBDownloadManager defaultManager] startDownloadWithURL:DownloadURLString sessionID:_currentSessionID];
+    _currentTaskID = [[MBDownloadManager defaultManager] startDownloadWithURL:DownloadURLString sessionID:_currentSessionID];
 }
 
 -(IBAction)pauseDownload:(id)sender

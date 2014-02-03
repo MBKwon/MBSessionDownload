@@ -10,23 +10,22 @@
 
 
 typedef void (^FirstBlock)(NSUInteger taskID);
-typedef void (^ProgressBlock)(int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite);
-typedef void (^ErrorBlock)(NSError *error);
-typedef void (^CompleteBlock)(BOOL isFinish, NSString *fielPath);
+typedef void (^ProgressBlock)(NSUInteger taskID, int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite);
+typedef void (^ErrorBlock)(NSUInteger taskID, NSError *error);
+typedef void (^CompleteBlock)(NSUInteger taskID, BOOL isFinish, NSString *fielPath);
 
 
-@interface MBURLSessionManager : NSURLSession <NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate>
+@interface MBURLSessionManager : NSObject <NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate>
 
-@property (strong, nonatomic) FirstBlock firstBlock;
+
 @property (strong, nonatomic) ProgressBlock progressBlock;
 @property (strong, nonatomic) ErrorBlock errorBlock;
 @property (strong, nonatomic) CompleteBlock completeBlock;
 
 
 -(NSURLSession *)getSessionWithConfiguration:(NSURLSessionConfiguration *)configuration
-                                  firstBlock:(FirstBlock)firstBlock
                                progressBlock:(ProgressBlock)progressBlock
                                   errorBlock:(ErrorBlock)errorBlock
-                                completeBolck:(CompleteBlock)completeBlock;
+                               completeBolck:(CompleteBlock)completeBlock;
 
 @end
