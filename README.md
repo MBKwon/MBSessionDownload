@@ -18,14 +18,13 @@ Requires **iOS 7.0 or later**.
 #### MBDownloadManager
 ```objective-c
 +(MBDownloadManager *)defaultManager;
--(void)initWithFirstBlock:(FirstBlock)firstBlock
-            progressBlock:(ProgressBlock)progressBlock
-               errorBlock:(ErrorBlock)errorBlock
-             completeBolck:(CompleteBlock)completeBlock;
+-(NSUInteger)makeSessionWithProgressBlock:(ProgressBlock)progressBlock
+                               errorBlock:(ErrorBlock)errorBlock
+                            completeBolck:(CompleteBlock)completeBlock;
 
 
--(void)startDownloadWithURL:(NSString *)downloadURLString;
--(void)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination;
+-(NSUInteger)startDownloadWithURL:(NSString *)downloadURLString sessionID:(NSUInteger)sessionID;
+-(NSUInteger)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination sessionID:(NSUInteger)sessionID;
 
 
 -(void)pauseDownloadWithIdentifier:(NSUInteger)taskID;
@@ -39,36 +38,34 @@ Requires **iOS 7.0 or later**.
 #### MBURLSessionManager
 ```objective-c
 -(NSURLSession *)getSessionWithConfiguration:(NSURLSessionConfiguration *)configuration
-                                  firstBlock:(FirstBlock)firstBlock
                                progressBlock:(ProgressBlock)progressBlock
                                   errorBlock:(ErrorBlock)errorBlock
-                                completeBolck:(CompleteBlock)completeBlock;
+                               completeBolck:(CompleteBlock)completeBlock;
 ```
 
 ## Usage
 
 
 ### 1. Blocks
+You can set different process blocks each session. But remember the session ID, that will be used to use a download process you set.
+
 To immediately start a download in the default MBDownloadManager directory (`<Application_Home>/temp` by default):
 
 ```objective-c
 #import "MBDowloadManager/MBDownloadManager.h"
 
-[[MBDownloadManager defaultManager]  initWithFirstBlock:^(NSUInteger taskID){
-        
-        NSLog(@"task identifier : %d", taskID);
-        _currentTaskID = taskID;
-        
-    } progressBlock:^(int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite){
+_currentSessionID = [[MBDownloadManager defaultManager]
+                         makeSessionWithProgressBlock:^(NSUInteger taskID, int64_t bytesWritten,
+                                                        int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite){
         
         NSLog(@"received data lenth : %lld \ntotal received data length : %lld \ntotal data length : %lld", bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
         [_progress setProgress:((double)totalBytesWritten/(double)totalBytesExpectedToWrite)];
         
-    } errorBlock:^(NSError *error){
+    } errorBlock:^(NSUInteger taskID, NSError *error){
         
         NSLog(@"download error : %@", [error localizedDescription]);
         
-    } completeBolck:^(BOOL isFinish, NSString *filePath){
+    } completeBolck:^(NSUInteger taskID, BOOL isFinish, NSString *filePath){
         
         if (isFinish) {
             NSLog(@"file path is %@", filePath);
@@ -77,7 +74,7 @@ To immediately start a download in the default MBDownloadManager directory (`<Ap
     }];
 
 
-[[MBDownloadManager defaultManager] startDownloadWithURL:downloadURLString];
+    _currentTaskID = [[MBDownloadManager defaultManager] startDownloadWithURL:DownloadURLString sessionID:_currentSessionID];
 
 ```
 
@@ -86,7 +83,7 @@ If you set a customPath:
 
 ```objective-c
 
-[[MBDownloadManager defaultManager] startDownloadWithURL:downloadURLString destination:CUSTOM_PATH];
+_currentTaskID = [[MBDownloadManager defaultManager] startDownloadWithURL:DownloadURLString destination:CUSTOM_PATH sessionID:_currentSessionID];
 
 ```
 
