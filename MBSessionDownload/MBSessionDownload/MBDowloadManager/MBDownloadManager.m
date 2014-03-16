@@ -78,7 +78,7 @@
         downloadTask = [[_sessionList objectAtIndex:sessionID] downloadTaskWithRequest:request];
     }
     
-    NSString *destinationKey = [NSString stringWithFormat:@"%d", downloadTask.taskIdentifier];
+    NSString *destinationKey = [NSString stringWithFormat:@"%lu", (unsigned long)downloadTask.taskIdentifier];
     [_destinationList setObject:destination forKey:destinationKey];
     [_sessionTaskList addObject:downloadTask];
     [downloadTask resume];

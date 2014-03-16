@@ -46,7 +46,7 @@
     NSURL *originalURL = [[downloadTask originalRequest] URL];
     NSError *errorCopy;
     
-    NSString *destinationKey = [NSString stringWithFormat:@"%d", downloadTask.taskIdentifier];
+    NSString *destinationKey = [NSString stringWithFormat:@"%lu", (unsigned long)downloadTask.taskIdentifier];
     NSURL *destinationURL = [NSURL URLWithString:[MBDownloadManager.defaultManager.destinationList objectForKey:destinationKey]];
     
     [fileManager removeItemAtURL:destinationURL error:NULL];
