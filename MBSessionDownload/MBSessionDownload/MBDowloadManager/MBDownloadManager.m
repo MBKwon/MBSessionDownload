@@ -16,9 +16,7 @@
 @interface MBDownloadManager ()
 
 @property (strong, nonatomic) MBURLSessionManager *sessionManager;
-@property (strong, nonatomic) NSMutableArray *sessionList;
 @property (strong, nonatomic) NSURLSessionConfiguration *configuration;
-@property (strong, nonatomic) NSMutableArray *sessionTaskList;
 
 @end
 
@@ -31,59 +29,97 @@
     dispatch_once(&onceToken, ^{
         instance = [[[self class] alloc] init];
         
-        instance.configuration = [NSURLSessionConfiguration backgroundSessionConfiguration:@"com.MBKWON.MBSessionDownload - BackgroundSession"];
+        if ([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending) {
+            instance.configuration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:@"com.MBKWON.MBSessionDownload - BackgroundSession"];
+        }
+        else {
+            instance.configuration = [NSURLSessionConfiguration backgroundSessionConfiguration:@"com.MBKWON.MBSessionDownload - BackgroundSession"];
+        }
+        instance.configuration.sharedContainerIdentifier = @"group.com.uangel.tomokids";
+        instance.configuration.allowsCellularAccess = YES;          // NO to WiFi only
+        instance.configuration.timeoutIntervalForRequest = 30.0;    // 30 seconds
+        instance.configuration.timeoutIntervalForResource = 60.0;   // 60 seconds
+        instance.configuration.HTTPMaximumConnectionsPerHost = 3;   // default value is 3
         
         instance.sessionManager = [MBURLSessionManager new];
-        instance.sessionList = [NSMutableArray new];
         instance.sessionTaskList = [NSMutableArray new];
         instance.destinationList = [NSMutableDictionary new];
+        instance.userInfo = [NSMutableDictionary new];
     });
     
     return instance;
 }
 
--(NSUInteger)makeSessionWithProgressBlock:(ProgressBlock)progressBlock
-                               errorBlock:(ErrorBlock)errorBlock
-                            completeBolck:(CompleteBlock)completeBlock
+- (NSURLSession *)makeSessionWithProgress
+{
+    return [self makeSessionWithProgressBlock:[_sessionManager progressBlock]
+                                   errorBlock:[_sessionManager errorBlock]
+                                completeBlock:[_sessionManager completeBlock]];
+}
+- (NSURLSession *)makeSessionWithCompleteBlock:(CompleteBlock)completeBlock
+{
+    if (completeBlock) {
+        return [self makeSessionWithProgressBlock:[_sessionManager progressBlock]
+                                       errorBlock:[_sessionManager errorBlock]
+                                    completeBlock:completeBlock];
+    }
+    else {
+        return [self makeSessionWithProgress];
+    }
+}
+- (NSURLSession *)makeSessionWithProgressBlock:(ProgressBlock)progressBlock
+                                    errorBlock:(ErrorBlock)errorBlock
+                                 completeBlock:(CompleteBlock)completeBlock
 {
     NSURLSession *session = [_sessionManager getSessionWithConfiguration:_configuration
                                                            progressBlock:progressBlock
                                                               errorBlock:errorBlock
                                                            completeBolck:completeBlock];
-    [_sessionList addObject:session];
-    return [_sessionList indexOfObject:session];
+    return session;
 }
 
 
--(NSUInteger)startDownloadWithURL:(NSString *)downloadURLString sessionID:(NSUInteger)sessionID
+-(NSInteger)session:(NSURLSession*)session startDownloadWithURL:(NSString *)downloadURLString;
 {
-    return [self startDownloadWithURL:downloadURLString destination:DEFAULT_DESTINATION sessionID:sessionID];
+    return [self session:session startDownloadWithURL:downloadURLString destination:DEFAULT_DESTINATION];
 }
 
--(NSUInteger)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination sessionID:(NSUInteger)sessionID
+-(NSInteger)session:(NSURLSession*)session startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination;
 {
-    NSString *key = MAKE_KEY(downloadURLString);
-    NSData *resumeData = [[EGOCache globalCache] dataForKey:key];
-    NSURLSessionDownloadTask *downloadTask;
-    
-    if (resumeData != nil) {
+    return [self session:session startDownloadWithURL:downloadURLString destination:destination withIdentifier:nil];
+}
+-(NSInteger)session:(NSURLSession*)session startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination withIdentifier:(id)identifier
+{
+    if (downloadURLString) {
+        NSString *key = MAKE_KEY(downloadURLString);
+        NSData *resumeData = [[EGOCache globalCache] dataForKey:key];
+        NSURLSessionDownloadTask *downloadTask;
         
-        [[EGOCache globalCache] removeCacheForKey:key];
-        downloadTask = [[_sessionList objectAtIndex:sessionID] downloadTaskWithResumeData:resumeData];
+        if (resumeData != nil) {
+            
+            [[EGOCache globalCache] removeCacheForKey:key];
+            downloadTask = [session downloadTaskWithResumeData:resumeData];
+            
+        } else {
+            
+            NSURL *downloadURL = [NSURL URLWithString:downloadURLString];
+            NSURLRequest *request = [NSURLRequest requestWithURL:downloadURL];
+            downloadTask = [session downloadTaskWithRequest:request];
+        }
         
-    } else {
+        NSString *destinationKey = [NSString stringWithFormat:@"%lu", (unsigned long)downloadTask.taskIdentifier];
+        [_destinationList setObject:destination forKey:destinationKey];
+        if (identifier) {
+            [_userInfo setObject:identifier forKey:destinationKey];
+        }
+        [_sessionTaskList addObject:downloadTask];
+        [downloadTask resume];
         
-        NSURL *downloadURL = [NSURL URLWithString:downloadURLString];
-        NSURLRequest *request = [NSURLRequest requestWithURL:downloadURL];
-        downloadTask = [[_sessionList objectAtIndex:sessionID] downloadTaskWithRequest:request];
+        return [downloadTask taskIdentifier];
     }
-    
-    NSString *destinationKey = [NSString stringWithFormat:@"%lu", (unsigned long)downloadTask.taskIdentifier];
-    [_destinationList setObject:destination forKey:destinationKey];
-    [_sessionTaskList addObject:downloadTask];
-    [downloadTask resume];
-    
-    return [downloadTask taskIdentifier];
+    else {
+        return -1;
+    }
 }
 
 
@@ -154,7 +190,118 @@
     [_sessionTaskList removeAllObjects];
 }
 
+- (void)removeDownloadTaskForUserInfoKey:(id)userKey
+{
+    if ([userKey isKindOfClass:[NSNumber class]]) {
+        for (NSString *tKey in [_userInfo allKeys]) {
+            if ([[_userInfo objectForKey:tKey] isEqualToNumber:userKey]) {
+                [self pauseDownloadWithIdentifier:[tKey integerValue]];
+                [self stopDownloadWithIdentifier:[tKey integerValue]];
+                [_userInfo removeObjectForKey:tKey];
+                break;
+            }
+        }
+    }
+}
 
 
+#pragma mark - Setup blocks
+- (void)setErrorBlock:(ErrorBlock)errorBlock
+{
+    if (errorBlock) {
+        [_sessionManager setErrorBlock:errorBlock];
+    }
+}
+- (void)setProgressBlock:(ProgressBlock)progressBlock
+{
+    if (progressBlock) {
+        [_sessionManager setProgressBlock:progressBlock];
+    }
+}
+- (void)setCompleteBlock:(CompleteBlock)completeBlock
+{
+    if (completeBlock) {
+        [_sessionManager setCompleteBlock:completeBlock];
+    }
+}
+
+
+#pragma mark - Check blocks
+- (BOOL)hasErrorBlock
+{
+    if ([_sessionManager errorBlock])
+        return YES;
+    else
+        return NO;
+}
+- (BOOL)hasProgressBlock
+{
+    if ([_sessionManager progressBlock])
+        return YES;
+    else
+        return NO;
+}
+- (BOOL)hasCompleteBlock
+{
+    if ([_sessionManager completeBlock])
+        return YES;
+    else
+        return NO;
+}
+
+
+#pragma mark - Number of Download Task
+- (NSUInteger)maxDownloadTasks
+{
+    return [self.configuration HTTPMaximumConnectionsPerHost];
+}
+- (NSUInteger)currentDownloadTasks
+{
+    return [_sessionTaskList count];
+}
+
+
+#pragma mark - User Info methods
+- (NSArray *)userInfosByCurrentDownloadTasks
+{
+    return [self userInfosByCurrentDownloadTasks:YES];
+}
+
+- (NSArray *)userInfosByCurrentDownloadTasks:(BOOL)includeWaiting
+{
+    NSMutableArray *waitingArr = [NSMutableArray new];
+    NSMutableArray *downloadingArr = [NSMutableArray new];
+    
+    for (NSURLSessionDownloadTask *aTask in _sessionTaskList) {
+        NSString *aKey = [NSString stringWithFormat:@"%lu", (unsigned long)aTask.taskIdentifier];
+        id userKey = [_userInfo objectForKey:aKey];
+        
+        if (aTask.state == NSURLSessionTaskStateRunning) {
+            if (aTask.countOfBytesReceived > 0) {
+                [downloadingArr addObject:userKey];
+            }
+            else {
+                [waitingArr addObject:userKey];
+            }
+        }
+    }
+    
+    NSArray *retArr = nil;
+    
+    if ([downloadingArr count]) {
+        retArr = [NSArray arrayWithArray:downloadingArr];
+    }
+    
+    if (!includeWaiting && [waitingArr count]) {
+        if (!retArr) {
+            retArr = [NSArray arrayWithArray:waitingArr];
+        }
+        else {
+            retArr = [retArr arrayByAddingObjectsFromArray:waitingArr];
+        }
+    }
+    
+    return retArr;
+}
 
 @end

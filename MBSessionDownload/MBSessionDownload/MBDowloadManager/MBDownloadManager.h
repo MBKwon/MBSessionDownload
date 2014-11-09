@@ -9,19 +9,34 @@
 #import <Foundation/Foundation.h>
 #import "MBURLSessionManager.h"
 
+
+@protocol MBDownloadTaskDelegate <NSObject>
+@optional
+- (void)downloadTaskFinished:(NSURLSessionDownloadTask *)task userInfo:(id)userInfo;
+@end
+
+
 @interface MBDownloadManager : NSObject
 
+@property (nonatomic, assign) id<MBDownloadTaskDelegate> delegate;
+
+@property (strong, nonatomic) NSMutableArray *sessionTaskList;
 @property (strong, nonatomic) NSMutableDictionary *destinationList;
+@property (strong, nonatomic) NSMutableDictionary *userInfo;
+
 
 
 +(MBDownloadManager *)defaultManager;
--(NSUInteger)makeSessionWithProgressBlock:(ProgressBlock)progressBlock
-                               errorBlock:(ErrorBlock)errorBlock
-                            completeBolck:(CompleteBlock)completeBlock;
+- (NSURLSession *)makeSessionWithProgress;
+- (NSURLSession *)makeSessionWithCompleteBlock:(CompleteBlock)completeBlock;
+- (NSURLSession *)makeSessionWithProgressBlock:(ProgressBlock)progressBlock
+                                    errorBlock:(ErrorBlock)errorBlock
+                                 completeBlock:(CompleteBlock)completeBlock;
 
 
--(NSUInteger)startDownloadWithURL:(NSString *)downloadURLString sessionID:(NSUInteger)sessionID;
--(NSUInteger)startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination sessionID:(NSUInteger)sessionID;
+-(NSInteger)session:(NSURLSession*)session startDownloadWithURL:(NSString *)downloadURLString;
+-(NSInteger)session:(NSURLSession*)session startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination;
+-(NSInteger)session:(NSURLSession*)session startDownloadWithURL:(NSString *)downloadURLString destination:(NSString *)destination withIdentifier:(id)identifier;
 
 
 -(void)pauseDownloadWithIdentifier:(NSUInteger)taskID;
@@ -30,5 +45,20 @@
 
 -(void)stopDownloadWithIdentifier:(NSUInteger)taskID;
 -(void)stopAllTasks;
+
+- (void)removeDownloadTaskForUserInfoKey:(id)userKey;
+
+- (void)setErrorBlock:(ErrorBlock)errorBlock;
+- (void)setProgressBlock:(ProgressBlock)progressBlock;
+- (void)setCompleteBlock:(CompleteBlock)completeBlock;
+- (BOOL)hasErrorBlock;
+- (BOOL)hasProgressBlock;
+- (BOOL)hasCompleteBlock;
+
+- (NSUInteger)maxDownloadTasks;
+- (NSUInteger)currentDownloadTasks;
+
+- (NSArray *)userInfosByCurrentDownloadTasks;
+- (NSArray *)userInfosByCurrentDownloadTasks:(BOOL)includeWaiting;
 
 @end
