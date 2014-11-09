@@ -14,7 +14,7 @@
 
 @interface DemoViewController ()
 
-@property (assign, nonatomic) NSUInteger currentSessionID;
+@property (strong, nonatomic) NSURLSession *currentSession;
 @property (assign, nonatomic) NSUInteger currentTaskID;
 
 @end
@@ -27,24 +27,23 @@
 	// Do any additional setup after loading the view, typically from a nib.
     
     
-    _currentSessionID = [[MBDownloadManager defaultManager]
-                         makeSessionWithProgressBlock:^(NSUInteger taskID, int64_t bytesWritten,
-                                                        int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite){
-        
-        NSLog(@"received data lenth : %lld \ntotal received data length : %lld \ntotal data length : %lld", bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
-        [_progress setProgress:((double)totalBytesWritten/(double)totalBytesExpectedToWrite)];
-        
-    } errorBlock:^(NSUInteger taskID, NSError *error){
-        
-        NSLog(@"download error : %@", [error localizedDescription]);
-        
-    } completeBolck:^(NSUInteger taskID, BOOL isFinish, NSString *filePath){
-        
-        if (isFinish) {
-            NSLog(@"file path is %@", filePath);
-        }
-        
-    }];
+    _currentSession = [[MBDownloadManager defaultManager]
+                       makeSessionWithProgressBlock:^(NSUInteger taskID, int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite, id identifier) {
+                           
+                           NSLog(@"received data lenth : %lld \ntotal received data length : %lld \ntotal data length : %lld", bytesWritten, totalBytesWritten, totalBytesExpectedToWrite);
+                           [_progress setProgress:((double)totalBytesWritten/(double)totalBytesExpectedToWrite)];
+                           
+                       } errorBlock:^(NSUInteger taskID, NSError *error, NSString *identifier) {
+                           
+                           NSLog(@"download error : %@", [error localizedDescription]);
+                           
+                       } completeBlock:^(NSUInteger taskID, BOOL isFinish, NSString *filePath, NSString *identifier) {
+                           
+                           if (isFinish) {
+                               NSLog(@"file path is %@", filePath);
+                           }
+                           
+                       }];
 }
 
 - (void)didReceiveMemoryWarning
@@ -56,7 +55,8 @@
 
 -(IBAction)startDownload:(id)sender
 {
-    _currentTaskID = [[MBDownloadManager defaultManager] startDownloadWithURL:DownloadURLString sessionID:_currentSessionID];
+    _currentTaskID = [[MBDownloadManager defaultManager]
+                      session:_currentSession startDownloadWithURL:DownloadURLString];
 }
 
 -(IBAction)pauseDownload:(id)sender
